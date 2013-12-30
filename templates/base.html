@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Datavis with D3</title>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    {% block more_css %}{% endblock %}
+    <script src="{% static 'js/jquery-2.0.3.js' %}" type="application/javascript"></script>
+    <script src="{% static 'js/d3.v3.js' %}" type="application/javascript"></script>
+    <script src="{% static 'js/bootstrap.js' %}" type="application/javascript"></script>
+  </head>
+  <body>
+    <h1>Datavis with D3</h1>
+
+    <address>
+      <a href="mailto:Jiaji@H4CKB0X-HOME"></a>
+    </address>
+    {% block more_js %}{% endblock %}
+    <script type="application/javascript">{% block d3 %}{% endblock %}</script>
+  </body>
+</html>

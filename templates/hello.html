@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block more_css %}
+<link href="{% static 'css/bar.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block more_js %}
+<script src="{% static 'js/hello.js' %}" type="application/javascript"></script>
+{% endblock %}
