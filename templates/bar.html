@@ -1,0 +1,17 @@
+{% extends 'hello.html' %}
+{% load static %}
+
+{% block more_js %}
+<script src="{% static 'js/bar.js' %}" type="application/javascript"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <button class="btn btn-primary col-md-offset-1"
+  id="change-data">Change Data</button>
+  <button class="btn btn-warning" id="insert-data">Insert
+  Data</button>
+  <button class="btn btn-danger" id="remove-data">Remove Data</button>
+  <button class="btn btn-primary" id="sort-data">Sort</button>
+</div>
+{% endblock %}

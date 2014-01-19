@@ -1,0 +1,6 @@
+{% extends 'hello.html' %}
+{% load static %}
+
+{% block more_js %}
+<script src="{% static 'js/pie.js' %}" type="application/javascript"></script>
+{% endblock %}

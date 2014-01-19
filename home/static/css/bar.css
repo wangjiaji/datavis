@@ -13,7 +13,12 @@ svg {
 
 svg rect.bar {
     stroke: teal;
-    fill: blue;
+    transition: all 0.2s;
+    /* fill: blue; */
+}
+
+svg rect.bar:hover {
+    fill: orange;
 }
 
 svg text.bar {
@@ -21,6 +26,7 @@ svg text.bar {
     font-size: 11px;
     fill: white;
     text-anchor: middle;
+    pointer-events: none;
 }
 
 svg text.scatter {

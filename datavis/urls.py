@@ -8,5 +8,8 @@ urlpatterns = patterns('',
     # url(r'^$', 'datavis.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', 'home.views.home', name='home'),
+    url(r'bar/$', 'home.views.barchart'),
+    url(r'pie/$', 'home.views.piechart'),
+    url(r'spa/$', 'spa.views.home'),
     url(r'^admin/', include(admin.site.urls)),
 )

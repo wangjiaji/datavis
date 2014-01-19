@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Single Page Application{% endblock %}
+
+{% block more_css %}
+<link rel="stylesheet" href="{% static 'css/spa.css' %}"
+      type="text/css">
+{% endblock %}
+
+{% block more_js %}
+<script src="{% static 'js/spa.js' %}"
+	type="application/javascript"></script>
+{% endblock %}
+
+{% block content %}
+<div id="spa">
+  <div class="spa-slider"></div>
+</div>
+{% endblock %}
