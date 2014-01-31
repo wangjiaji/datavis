@@ -45,3 +45,13 @@ svg text.scatter {
     font-family: sans-serif;
     font-size: 11px;
 }
+
+line {
+    stroke: #ccc;
+    stroke-width: 1;
+}
+
+g.state text {
+    font-size: 9px;
+    text-anchor: middle;
+}

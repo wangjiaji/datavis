@@ -17,4 +17,6 @@
     cursor: pointer;
     border-radius: 8px 0 0 0;
     background-color: #f00;
+    transition: height 1s ease-in-out;
+    -webkit-transition: height 1s ease-out;
 }

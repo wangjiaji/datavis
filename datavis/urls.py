@@ -10,6 +10,9 @@ urlpatterns = patterns('',
     url(r'^$', 'home.views.home', name='home'),
     url(r'bar/$', 'home.views.barchart'),
     url(r'pie/$', 'home.views.piechart'),
+    url(r'force/$', 'home.views.forcechart'),
+    url(r'map/$', 'home.views.geomap'),
+
     url(r'spa/$', 'spa.views.home'),
     url(r'^admin/', include(admin.site.urls)),
 )

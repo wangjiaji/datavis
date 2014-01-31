@@ -8,3 +8,10 @@ def barchart(request):
 
 def piechart(request):
     return render(request, 'pie.html')
+
+
+def forcechart(request):
+    return render(request, 'force.html')
+
+def geomap(request):
+    return render(request, 'geomap.html')
