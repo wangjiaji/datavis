@@ -55,3 +55,13 @@ g.state text {
     font-size: 9px;
     text-anchor: middle;
 }
+
+path {
+    stroke: black;
+}
+
+g.state:hover {
+    cursor: pointer;
+    filter: url(#shadow);
+    overflow: visible;
+}

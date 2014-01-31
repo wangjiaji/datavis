@@ -1,4 +1,18 @@
-var svg = d3.select('body').append('svg').classed('map', true);
+var svg = d3.select('body div.container').append('svg').classed('map', true);
+
+var defs = svg.append('defs')
+var filter = defs.append('filter')
+    .attr({id: 'shadow', x: 0, y: 0, width: '250%', height: '250%'});
+
+filter.append('feGaussianBlur')
+    .attr({in: 'SourceAlpha', stdDeviation: 8.2});
+filter.append('feOffest')
+    .attr({result: 'offsetBlue', dx: 3, dy: 2});
+var merge = filter.append('feMerge');
+merge.append('feMergeNode');
+merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+
 
 var path = d3.geo.path();
 
@@ -52,17 +66,17 @@ d3.csv('/static/js/us-ag-productivity-2004.csv', function (data) {
     });
 
     d3.csv('/static/js/us-cities.csv', function (data) {
-    svg.selectAll('circle').data(data).enter()
-	.append('circle')
-	.attr({
-	    cx: function (d) { return projection([d.lon, d.lat])[0]; },
-	    cy: function (d) { return projection([d.lon, d.lat])[1]; },
-	    r: function (d) { return Math.sqrt(+d.population) * 0.008; }
-	})
-	.style({
-	    fill: 'red',
-	    opacity: 0.75
-	});
+	svg.selectAll('circle').data(data).enter()
+	    .append('circle')
+	    .attr({
+		cx: function (d) { return projection([d.lon, d.lat])[0]; },
+		cy: function (d) { return projection([d.lon, d.lat])[1]; },
+		r: function (d) { return Math.sqrt(+d.population) * 0.008; }
+	    })
+	    .style({
+		fill: 'red',
+		opacity: 0.75
+	    });
     });
 
 });
