@@ -1,3 +1,4 @@
+/* Begin spa namespace selector */
 #spa {
     position: absolute;
     top: 8px;
@@ -6,6 +7,16 @@
     right: 8px;
     border-radius: 8px 8px 0 8px;
     background-color: #fff;
+}
+/* End spa namespace selector */
+
+/* Begin utility selectors */
+.spa-x-select {}
+.spa-x-clear-float {
+    height: 0;
+    float: none;
+    visibility: hidden;
+    clear: both;
 }
 
 .spa-slider {
