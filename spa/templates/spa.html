@@ -4,26 +4,22 @@
 {% block title %}Single Page Application{% endblock %}
 
 {% block more_css %}
-<link rel="stylesheet" href="{% static 'css/spa.css' %}"
-      type="text/css">
+<link rel="stylesheet" href="{% static 'css/spa.css' %}" type="text/css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/spa.shell.css' %}">
 {% endblock %}
 
 {% block more_js %}
 <script src="{% static 'js/spa.js' %}"
 	type="application/javascript"></script>
-<script src="{% static 'js/spa.shell.js %}"></script>
+<script src="{% static 'js/spa.shell.js' %}"></script>
 <script>
   $(function () { spa.initModule($('#spa')); });
 </script>
 {% endblock %}
 
-{% block more_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/spa.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/spa.shell.css %}">
-{% endblock %}
 
 {% block content %}
-<div id="spa">
-
+<div id="spa" class="container">
+  <!-- Dynamic content will be inserted here -->
 </div>
 {% endblock %}

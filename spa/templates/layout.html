@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HTML Layout{% endblock %}
+
+{% block more_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/spa.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}">
+{% endblock %}
+
+{% block content %}
+<section id="spa" class="container">
+  <header class="spa-shell-head">
+    <div class="spa-shell-head-logo col-md-1 pull-left"></div>
+    <div class="spa-shell-head-acct col-md-1 pull-right"></div>
+    <div class="spa-shell-head-search col-md-2 pull-right"></div>
+  </header>
+
+  <main class="spa-shell-main panel panel-default">
+    <nav class="spa-shell-main-nav col-md-2 pull-left"></nav>
+    <article class="spa-shell-main-content panel-body"></article>
+  </main>
+
+  <footer class="spa-shell-foot"></footer>
+  <div class="spa-shell-chat col-md-3"></div>
+  <div class="spa-shell-modal popover"></div>
+</section>
+{% endblock %}
