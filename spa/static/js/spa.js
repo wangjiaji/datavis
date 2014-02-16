@@ -9,9 +9,3 @@ var spa = (function () {
     }
     return { initModule: initModule };
 })();
-
-// Start spa once DOM is ready
-//
-$(function () {
-    spa.initModule($('#spa'));
-});

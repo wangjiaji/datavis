@@ -6,13 +6,25 @@
 {% block more_css %}
 <link rel="stylesheet" href="{% static 'css/spa.css' %}" type="text/css">
 <link rel="stylesheet" type="text/css" href="{% static 'css/spa.shell.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/spa.chat.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/spa.avatar.css' %}">
 {% endblock %}
 
 {% block more_js %}
 <script src="{% static 'js/jquery.uriAnchor.js' %}"></script>
+<script src="{% static 'js/jquery.event.ue.js' %}"></script>
+<script src="{% static 'js/jquery.event.gevent.js' %}"></script>
+<script src="{% static 'js/taffy.js' %}"></script>
 <script src="{% static 'js/spa.js' %}"
 	type="application/javascript"></script>
+<script src="{% static 'js/spa.data.js' %}"></script>
+<script src="{% static 'js/spa.fake.js' %}"></script>
+<script src="{% static 'js/spa.model.js' %}"></script>
+<script src="{% static 'js/spa.util.js' %}"></script>
+<script src="{% static 'js/spa.util_b.js' %}"></script>
 <script src="{% static 'js/spa.shell.js' %}"></script>
+<script src="{% static 'js/spa.chat.js' %}"></script>
+<script src="{% static 'js/spa.avatar.js' %}"></script>
 <script>
   $(function () { spa.initModule($('#spa')); });
 </script>

@@ -1,0 +1,1 @@
+spa.avatar = (function () { return {}; })();
