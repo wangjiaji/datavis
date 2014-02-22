@@ -1,18 +1,22 @@
 spa.shell = (function () {
+    'use strict';
     // -------- BEGIN MODULE SCOPE VARIABLES --------
     var configMap = {
 	anchor_schema_map: {
 	    chat: { opened: true, closed: true }
 	},
 	main_html: String()
-	    +  '<header class="spa-shell-head">'
-	    +    '<div class="spa-shell-head-logo col-md-1 pull-left"></div>'
-	    +    '<div class="spa-shell-head-acct col-md-1 pull-right"></div>'
+	    +  '<header class="spa-shell-head row">'
+	    +    '<div class="spa-shell-head-logo col-md-2 pull-left">'
+            +       '<h1>SPA</h1>'
+            +       '<p>Javascript end to end</p>'
+            +    '</div>'
+	    +    '<div class="spa-shell-head-acct col-md-2 pull-right"></div>'
 	    +    '<div class="spa-shell-head-search col-md-2 pull-right"></div>'
 	    +  '</header>'
-	    +  '<main class="spa-shell-main panel panel-default">'
+	    +  '<main class="spa-shell-main panel panel-default row">'
 	    +    '<nav class="spa-shell-main-nav col-md-2 pull-left"></nav>'
-	    +    '<article class="spa-shell-main-content panel-body"></article>'
+	    +    '<article class="spa-shell-main-content col-md-10 panel-body"></article>'
 	    +  '</main>'
 	    +  '<footer class="spa-shell-foot"></footer>'
 	    +  '<div class="spa-shell-modal popover"></div>'
@@ -22,8 +26,8 @@ spa.shell = (function () {
 	anchor_map: {},
     },
     jqueryMap = {},
-    copyAnchorMap, setJqueryMap,
-    changeAnchorPart, onHashchange,
+    copyAnchorMap, setJqueryMap, onResize, onTapAcct,
+    changeAnchorPart, onHashchange, onLogin, onLogout,
     setChatAnchor, initModule;
     // -------- END MODULE SCOPE VARIABLES ----------
 
@@ -40,6 +44,8 @@ spa.shell = (function () {
 	var $container = stateMap.$container;
 	jqueryMap = {
 	    $container: $container,
+            $acct: $container.find('.spa-shell-head-acct'),
+            $nav: $container.find('.spa-shell-main-nav')
 	};
     };
     // End DOM method /setJqueryMap/
@@ -144,11 +150,34 @@ spa.shell = (function () {
 	return false;
     };
     // End Event handler /onHashchange/
+    
+    // Begin Event Handler /onTapAcct/
+    onTapAcct = function (event) {
+        var acct_text, username, user = spa.model.people.get_user();
+
+        if (user.is_anon()) {
+            username = prompt('Please sign-in');
+            spa.model.people.login(username);
+            jqueryMap.$acct.text('...logging in...');
+        } else {
+            spa.model.people.logout();
+        }
+
+        return false;
+    };
+    // End Event Handler /onTapAcct/
+    
+    onLogin = function (_, user) {
+        jqueryMap.$acct.text(user.name);
+    };
+
+    onLogout = function () {
+        jqueryMap.$acct.text('Please sign in');
+    };
     // -------- END EVENT HANDLERS ------------------
 
     // -------- BEGIN CALLBACKS ---------------------
     setChatAnchor = function (position) {
-	console.log(position);
 	return changeAnchorPart({ chat: position });
     }
     // -------- END CALLBACKS -----------------------
@@ -160,7 +189,6 @@ spa.shell = (function () {
 	$container.html(configMap.main_html);
 	setJqueryMap();
 
-	console.log('init shell');
 	// Configure uriAnchor
 	$.uriAnchor.configModule({
 	    schema_map: configMap.anchor_schema_map
@@ -180,9 +208,17 @@ spa.shell = (function () {
 	$(window)
 	    .bind('hashchange', onHashchange)
 	    .trigger('hashchange');
+
+        $.gevent.subscribe($container, 'spa-login', onLogin);
+        $.gevent.subscribe($container, 'spa-logout', onLogout);
+
+        jqueryMap.$acct
+            .text('Please sign in')
+            .on('utap', onTapAcct);
     };
-    // End Public mehtod /initModule/
 
     return { initModule: initModule };
+    // End Public mehtod /initModule/
     // -------- END PUBLIC METHODS ------------------
 })();
+

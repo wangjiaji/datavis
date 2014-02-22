@@ -76,10 +76,8 @@ spa.chat = (function () {
     // Event Handlers
     onClickToggle = function (event) {
 	if (stateMap.position === 'opened') {
-	    console.log('close!');
 	    configMap.set_chat_anchor('closed');
 	} else if (stateMap.position === 'closed') {
-	    console.log('open!');
 	    configMap.set_chat_anchor('opened');
 	}
 
