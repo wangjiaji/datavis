@@ -1,4 +1,5 @@
 spa.chat = (function () {
+    'use strict';
     // Module scope variables
     var
     configMap = {
@@ -11,16 +12,24 @@ spa.chat = (function () {
 	    +    '</header>'
 
 	    +    '<div class="spa-chat-sizer">'
-	    +      '<main class="spa-chat-msgs"></main>'
-	    +      '<div class="spa-chat-box input-group">'
-	    +        '<input type="text" class="form-control" />'
-	    +        '<span class="input-group-btn">'
-	    +        '<button type="button" class="btn btn-default">Send</button>'
-	    +        '</span>'
-	    +      '</div>'
-	    +    '</div>'
-
-	    
+	    +      '<main class="spa-chat-msgs">'
+            +         '<aside class="spa-chat-list pull-left">'
+            +           '<div class="spa-chat-list-box"></div>'
+            +         '</aside>'
+            +         '<div class="spa-chat-msgs-log"></div>'
+            +      '</main>'
+            +      '<div class="spa-chat-msgs-in">'
+            +        '<form class="spa-chat-msgs-form">'
+            +          '<div class="spa-chat-box input-group">'
+            +             '<input class="form-control" type="text" />'
+            +             '<span class="input-group-btn">'
+            +                '<button class="btn btn-default spa-chat-msgs-send">Send</button>'
+            +             '</span>'
+            +          '</div>'
+            +          '<input type="submit" class="hide" />'
+            +        '</form>'
+            +      '</div>'
+	    +   '</div>'
 	    + '</div>',
 
 	settable_map: {
@@ -36,6 +45,9 @@ spa.chat = (function () {
 	    set_chat_anchor: true
 	},
 
+        chat_model: null,
+        people_model: null,
+
 	chat_open_time: '700ms',
 	chat_opened_height: 360,
 	chat_opened_title: 'Click to close',
@@ -48,7 +60,10 @@ spa.chat = (function () {
     
     stateMap = { $container: null },
     jqueryMap = {},
-    setJqueryMap, configModule, initModule,
+    scrollChat, writeChat, writeAlert, clearChat,
+    onUpdateChat, onSubmitMsg, onClickList,
+    onSetchatee, onListchange, onLogin, onLogout,
+    setJqueryMap, configModule, initModule, setSliderPosition,
     onClickToggle, removeChat, handleResize;
 
     // Utility methods
@@ -66,26 +81,20 @@ spa.chat = (function () {
 	    $glyphicon: $chat.find('.spa-chat-head-toggle > .glyphicon'),
 	    $title: $chat.find('.spa-chat-head-title'),
 	    $sizer: $chat.find('.spa-chat-sizer'),
-	    $msgs: $chat.find('.spa-chat-msgs'),
-	    $box: $chat.find('.spa-chat-box'),
-	    $input: $chat.find('input[type=text]')
+            $list_box: $chat.find('.spa-chat-list-box'),
+	    $msgs_log: $chat.find('.spa-chat-msgs-log'),
+            $msgs_in: $chat.find('.spa-chat-msgs-in'),
+            $input: $chat.find('.spa-chat-msgs-in input[type=text]'),
+            $send: $chat.find('.spa-chat-msgs-send'),
+            $form: $chat.find('.spa-chat-msgs-form')
 	};
     };
     // End /setJquery/
 
-    // Event Handlers
-    onClickToggle = function (event) {
-	if (stateMap.position === 'opened') {
-	    configMap.set_chat_anchor('closed');
-	} else if (stateMap.position === 'closed') {
-	    configMap.set_chat_anchor('opened');
-	}
-
-	return false;
-    };
-
     // Public methods
     initModule = function ($container) {
+        var $list_box;
+        
 	stateMap.$container = $container;
 	$container.append(configMap.main_html);
 	setJqueryMap();
@@ -93,6 +102,18 @@ spa.chat = (function () {
 	jqueryMap.$toggle.attr('title', configMap.chat_closed_title);
 	jqueryMap.$head.click(onClickToggle);
 	stateMap.position = 'closed';
+
+        $list_box = jqueryMap.$list_box;
+        $.gevent.subscribe($list_box, 'spa-listchange', onListchange);
+        $.gevent.subscribe($list_box, 'spa-setchatee', onSetchatee);
+        $.gevent.subscribe($list_box, 'spa-updatechat', onUpdateChat);
+        $.gevent.subscribe($list_box, 'spa-login', onLogin);
+        $.gevent.subscribe($list_box, 'spa-logout', onLogout);
+
+        jqueryMap.$head.bind('utap', onClickToggle);
+        jqueryMap.$list_box.bind('utap', onClickList);
+        jqueryMap.$send.bind('utap', onSubmitMsg);
+        jqueryMap.$form.bind('submit', onSubmitMsg);
 	
 	return true;
     };
@@ -124,13 +145,20 @@ spa.chat = (function () {
 	is_sliding = !is_closed && !is_open,
 	height, title, duration;
 
-	if (is_sliding || (position === 'opened' && is_open) || (position === 'closed' && is_closed)) return false;
+        if (position === 'opened' &&
+                configMap.people_model.get_user().is_anon())
+            return false;
+	if (is_sliding ||
+                (position === 'opened' && is_open) ||
+                (position === 'closed' && is_closed))
+            return false;
 
 	switch (position) {
 	case 'opened':
 	    height = configMap.chat_opened_height;
 	    title = configMap.chat_opened_title;
 	    duration = configMap.chat_open_time;
+            jqueryMap.$input.focus();
 	    break;
 	case 'closed':
 	    height = configMap.chat_closed_height;
@@ -144,7 +172,8 @@ spa.chat = (function () {
 	jqueryMap.$chat.css('transition', 'height ' + duration + ' ease-out');
 	jqueryMap.$chat.height(height);
 
-	jqueryMap.$chat.one('webkitTransitionEnd transitionend', function (event) {
+	jqueryMap.$chat.one('transitionend', function (event) {
+            console.log('transition end');
 	    jqueryMap.$glyphicon.toggleClass('glyphicon-resize-full glyphicon-resize-small');
 	    jqueryMap.$head.attr('title', title);
 	    stateMap.position = position;
@@ -153,6 +182,172 @@ spa.chat = (function () {
 	});
 	
 	return true;
+    };
+
+    // Begin private DOM methods to manage chat message
+    scrollChat = function () {
+        var $msgs_log = jqueryMap.$msgs_log;
+        $msgs_log.animate({
+            scrollTop: $msgs_log.prop('scrollHeight') - $msgs_log.height()
+        }, 150);
+    };
+
+    writeChat = function (person_name, text, is_user) {
+        var msg_class = is_user ? 'spa-chat-msgs-log-me' : 'spa-chat-msgs-log-msg';
+
+        jqueryMap.$msgs_log.append(
+                '<div class="' + msg_class + '">' +
+                spa.util_b.encodeHtml(person_name) + ': ' +
+                spa.util_b.encodeHtml(text) +
+                '</div>'
+        );
+
+        scrollChat();
+    };
+
+    writeAlert = function (alert_text) {
+        jqueryMap.$msgs_log.append(
+            '<div class="alert alert-info">' +
+            spa.util_b.encodeHtml(alert_text) +
+            '</div>'
+        );
+        scrollChat();
+    };
+
+    clearChat = function () {
+        jqueryMap.$msgs_log.empty();
+    };
+
+    // Event Handlers
+    onSubmitMsg = function (event) {
+        var msg_text = jqueryMap.$input.val();
+        if (msg_text.trim() === '') {
+            return false;
+        }
+
+        configMap.chat_model.send_msg(msg_text);
+        jqueryMap.$input.focus();
+        jqueryMap.$send.addClass('spa-x-select');
+        setTimeout(function () {
+            jqueryMap.$send.removeClass('spa-x-select');
+        }, 250);
+        return false;
+    };
+
+    onClickToggle = function (event) {
+	if (stateMap.position === 'opened') {
+	    configMap.set_chat_anchor('closed');
+	} else if (stateMap.position === 'closed') {
+	    configMap.set_chat_anchor('opened');
+	}
+
+	return false;
+    };
+
+    onClickList = function (event) {
+        var $elem = $(event.elem_target), chatee_id;
+
+        if(!$elem.hasClass('spa-chat-list-name'))
+            return false;
+
+        chatee_id = $elem.data('id');
+        if (!chatee_id)
+            return false;
+
+        configMap.chat_model.set_chatee(chatee_id);
+        return false;
+    };
+
+    onSetchatee = function (event, arg_map) {
+        var new_chatee = arg_map.new_chatee,
+            old_chatee = arg_map.old_chatee;
+
+        jqueryMap.$input.focus();
+        if (!new_chatee) {
+            if (old_chatee)
+                writeAlert(old_chatee.name + ' has left the chat.');
+            else
+                writeAlert('Your friend has left the chat');
+
+            jqueryMap.$title.text('Chat');
+            return false;
+        }
+        jqueryMap.$list_box.find('.spa-chat-list-name')
+            .removeClass('spa-x-select')
+            .end()
+            .find('[data-id=' + new_chatee.id + ']')
+            .addClass('spa-x-select');
+
+        writeAlert('Now chatting with ' + new_chatee.name);
+        jqueryMap.$title.text(new_chatee.name);
+        return true;
+    };
+
+    onListchange = function (event) {
+        var list_html = String(),
+            people_db = configMap.people_model.get_db(),
+            chatee = configMap.chat_model.get_chatee();
+
+        people_db().each(function (person, i) {
+            var select_class = '';
+
+            if (person.is_anon() || person.is_user()) {
+                return true;
+            }
+
+            if (chatee && chatee.id === person.id) {
+                select_class = ' spa-x-select';
+            }
+
+            list_html += '<div class="spa-chat-list-name' +
+                select_class +
+                '" data-id="' + person.id + '">' +
+                spa.util_b.encodeHtml(person.name) +
+                '</div>';
+        });
+
+        if (!list_html) {
+            list_html = '<div class="spa-chat-list-note">' +
+                'To chat alone is the fate of all great souls...<br><br>' +
+                'No one is online' +
+                '</div>';
+            clearChat();
+        }
+
+        jqueryMap.$list_box.html(list_html);
+    };
+
+    onUpdateChat = function (event, msgmap) {
+        var is_user, sender_id = msgmap.sender_id,
+            msg_text = msgmap.msg_text,
+            chatee = configMap.chat_model.get_chatee() || {},
+            sender = configMap.people_model.get_by_cid(sender_id);
+
+        if (!sender) {
+            writeAlert(msg_text);
+            return false;
+        }
+
+        is_user = sender.is_user();
+        if (!(is_user || sender_id === chatee.id)) {
+            configMap.chat_model.set_chatee(sender_id);
+        }
+        writeChat(sender.name, msg_text, is_user);
+
+        if (is_user) {
+            jqueryMap.$input.val('');
+            jqueryMap.$input.focus();
+        }
+    };
+
+    onLogin = function (event, login_user) {
+        configMap.set_chat_anchor('opened');
+    };
+
+    onLogout = function (event, logout_user) {
+        configMap.set_chat_anchor('closed');
+        jqueryMap.$title.text('Chat');
+        clearChat();
     };
 
     // Begin public method /removeChat/

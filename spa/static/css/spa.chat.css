@@ -15,6 +15,7 @@
 
 .spa-chat:hover {
     background: #a00;
+    border-radius: 4px;
 }
 
 .spa-chat-head, .spa-chat-closer {
@@ -40,7 +41,25 @@
     height: 332px;
 }
 
+.spa-chat-msgs-form > input[type=submit] {
+    display: none;
+}
+
 .spa-chat-box {
     position: absolute;
     bottom: 0;
+}
+
+aside.spa-chat-list {
+    width: 20%;
+    padding: 4px;
+}
+
+.spa-chat-msgs-log {
+    padding: 4px;
+    width: 80%;
+}
+
+main.spa-chat-msgs > * {
+    display: inline-block;
 }
